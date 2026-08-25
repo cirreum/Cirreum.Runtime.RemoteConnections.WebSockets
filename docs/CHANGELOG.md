@@ -1,4 +1,4 @@
-﻿# Changelog
+# Changelog
 
 All notable changes to **Cirreum.Runtime.RemoteConnections.WebSockets** are documented in this file.
 
@@ -11,6 +11,8 @@ guides linked at the bottom of each entry.
 ---
 
 ## [Unreleased]
+
+## [1.0.0] - 2026-08-25
 
 Initial release of **Cirreum.Runtime.RemoteConnections.WebSockets**.
 
