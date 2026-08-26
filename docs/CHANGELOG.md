@@ -12,6 +12,8 @@ guides linked at the bottom of each entry.
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-08-26
+
 ### Fixed
 
 * **A connection is registered scoped in a browser, and a singleton on a server.** It was always a
