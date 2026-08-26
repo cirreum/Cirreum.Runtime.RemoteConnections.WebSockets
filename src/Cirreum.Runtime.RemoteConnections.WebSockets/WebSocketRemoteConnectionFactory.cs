@@ -20,7 +20,7 @@ internal sealed class WebSocketRemoteConnectionFactory<TConnection>(
 		var instanceOptions = Copy(options);
 		configure?.Invoke(instanceOptions);
 
-		var context = WebSocketRemoteConnectionContext.Create(services, instanceOptions, configureTransport);
+		var context = WebSocketRemoteConnectionContext.Create<TConnection>(services, instanceOptions, configureTransport);
 		return ActivatorUtilities.CreateInstance<TConnection>(services, context);
 
 	}
@@ -29,7 +29,8 @@ internal sealed class WebSocketRemoteConnectionFactory<TConnection>(
 		return new RemoteConnectionOptions(source.ApplicationName) {
 			EndpointUri = source.EndpointUri,
 			AuthorizationHeader = source.AuthorizationHeader,
-			AccessTokenProvider = source.AccessTokenProvider,
+			CredentialProvider = source.CredentialProvider,
+			Scopes = source.Scopes,
 			Reconnect = source.Reconnect,
 			ReconnectMaxDelay = source.ReconnectMaxDelay,
 		};

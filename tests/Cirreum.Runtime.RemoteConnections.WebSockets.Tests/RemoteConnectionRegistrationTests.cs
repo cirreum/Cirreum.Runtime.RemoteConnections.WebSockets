@@ -23,6 +23,8 @@ public class RemoteConnectionRegistrationTests {
 
 		public Uri Endpoint { get; } = context.Options.EndpointUri;
 
+		public IReadOnlyList<string> Scopes { get; } = context.Options.Scopes;
+
 	}
 
 	private sealed class OtherConnection(WebSocketRemoteConnectionContext context) : WebSocketRemoteConnection(context);
@@ -216,6 +218,45 @@ public class RemoteConnectionRegistrationTests {
 		var subsequent = factory.Create();
 
 		subsequent.Endpoint.Should().Be(new Uri(HubUri));
+
+	}
+
+	// ---------------------------------------------------------------------
+	// What the factory's per-instance copy carries
+	// ---------------------------------------------------------------------
+
+	[Fact]
+	public async Task A_factory_created_instance_carries_the_registered_scopes() {
+
+		// The factory copies the registered options per instance. A property the copy forgets is
+		// silently lost, and for scopes that means a connection whose credential source is never
+		// told what audience to mint for.
+		var builder = new TestBuilder();
+		builder.AddRemoteConnectionFactory<TestConnection>(options => {
+			options.EndpointUri = new Uri(HubUri);
+			options.Scopes = ["api://contoso/access_as_user"];
+		});
+
+		await using var provider = builder.Services.BuildServiceProvider();
+		var created = provider.GetRequiredService<IRemoteConnectionFactory<TestConnection>>().Create();
+
+		created.Scopes.Should().Equal("api://contoso/access_as_user");
+
+	}
+
+	[Fact]
+	public async Task A_registered_connection_carries_the_registered_scopes() {
+
+		var builder = new TestBuilder();
+		builder.AddRemoteConnection<TestConnection>(options => {
+			options.EndpointUri = new Uri(HubUri);
+			options.Scopes = ["api://contoso/access_as_user"];
+		});
+
+		await using var provider = builder.Services.BuildServiceProvider();
+
+		provider.GetRequiredService<TestConnection>().Scopes
+			.Should().Equal("api://contoso/access_as_user");
 
 	}
 

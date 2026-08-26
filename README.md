@@ -93,8 +93,28 @@ when the caller is ready.
   equal options is a no-op; with different options, or under both verbs, it throws. Subclass the
   connection to reach a second endpoint.
 - **Credentials** resolve from the options when set, and otherwise from the host's ambient
-  `IRemoteConnectionTokenSource`. Every connect and reconnect attempt builds a fresh socket and
-  re-resolves the credential, because a `ClientWebSocket` cannot be reconnected once closed.
+  `IRemoteConnectionCredentialSource`. Every connect and reconnect attempt builds a fresh socket and
+  re-resolves the credential, because a `ClientWebSocket` cannot be reconnected once closed. Name
+  the audience on the options and the host mints for it:
+
+  ```csharp
+  builder.AddRemoteConnectionFactory<RealtimeVoiceConnection>(options => {
+      options.EndpointUri = new Uri("wss://provider.example.com/realtime");
+      options.Scopes = ["api://contoso/access_as_user"];
+  });
+  ```
+
+  A source registered *keyed* to a connection type is preferred over the unkeyed one for that
+  connection, so a bridge holding one socket to a provider and another to its own backend can give
+  each its own mechanism:
+
+  ```csharp
+  services.AddKeyedScoped<IRemoteConnectionCredentialSource, ProviderCredentialSource>(typeof(RealtimeVoiceConnection));
+  ```
+
+  For a factory registration the options are copied per instance, so `Create`'s adjustment — a
+  different audience for one call — does not reach the registration every later session is built
+  from.
 - **The native transport** is reachable through the optional `configureTransport` delegate, which
   receives `ClientWebSocketOptions` for each socket after the framework has configured it — the
   place to offer subprotocols.
