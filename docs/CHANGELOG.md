@@ -12,6 +12,10 @@ guides linked at the bottom of each entry.
 
 ## [Unreleased]
 
+### Updated
+
+- Updated NuGet packages.
+
 ## [1.0.0] - 2026-08-25
 
 Initial release of **Cirreum.Runtime.RemoteConnections.WebSockets**.

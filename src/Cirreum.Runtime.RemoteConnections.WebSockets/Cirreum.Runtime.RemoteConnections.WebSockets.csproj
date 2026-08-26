@@ -9,7 +9,7 @@
 
 	<ItemGroup>
 		<!-- Cirreum.Domain / Contracts / Kernel (incl. IDomainApplicationBuilder) flow in transitively. -->
-		<PackageReference Include="Cirreum.RemoteConnections.WebSockets" Version="1.0.1" />
+		<PackageReference Include="Cirreum.RemoteConnections.WebSockets" Version="2.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
