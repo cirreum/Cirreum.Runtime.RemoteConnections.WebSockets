@@ -74,12 +74,17 @@ public static class RemoteConnectionHostingExtensions {
 				return builder;
 			}
 
+			var lifetime = LifetimeFor(OperatingSystem.IsBrowser());
+
 			builder.Services
-				.AddSingleton(sp => {
+				.Add(new ServiceDescriptor(typeof(TConnection), sp => {
 					var context = WebSocketRemoteConnectionContext.Create<TConnection>(sp, options, configureTransport);
 					return ActivatorUtilities.CreateInstance<TConnection>(sp, context);
-				})
-				.AddSingleton<IRemoteConnection>(sp => sp.GetRequiredService<TConnection>());
+				}, lifetime));
+
+			builder.Services
+				.Add(new ServiceDescriptor(typeof(IRemoteConnection),
+					sp => sp.GetRequiredService<TConnection>(), lifetime));
 
 			return builder;
 
@@ -150,13 +155,30 @@ public static class RemoteConnectionHostingExtensions {
 			}
 
 			builder.Services
-				.AddSingleton<IRemoteConnectionFactory<TConnection>>(sp =>
-					new WebSocketRemoteConnectionFactory<TConnection>(sp, options, configureTransport));
+				.Add(new ServiceDescriptor(typeof(IRemoteConnectionFactory<TConnection>),
+					sp => new WebSocketRemoteConnectionFactory<TConnection>(sp, options, configureTransport),
+					LifetimeFor(OperatingSystem.IsBrowser())));
 
 			return builder;
 
 		}
 
 	}
+
+	/// <summary>
+	/// The lifetime a connection is registered with, which differs by host.
+	/// </summary>
+	/// <remarks>
+	/// A browser has exactly one scope, created by the host and living as long as the application,
+	/// and every service the application composes - the access-token provider among them - is
+	/// registered against it. A singleton lives in the root container instead, where none of them
+	/// can be reached. Scoped is therefore the application lifetime there.
+	/// <para>
+	/// On a server the reverse holds: a scope is a request, so a scoped connection would be a new
+	/// connection for every one of them.
+	/// </para>
+	/// </remarks>
+	internal static ServiceLifetime LifetimeFor(bool isBrowser) =>
+		isBrowser ? ServiceLifetime.Scoped : ServiceLifetime.Singleton;
 
 }

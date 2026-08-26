@@ -17,4 +17,9 @@
 		<Using Include="Cirreum.RemoteServices.Connections" />
 	</ItemGroup>
 
+	<!-- InternalsVisibleTo: Local Development Only -->
+	<ItemGroup Label="InternalsVisibleTo" Condition="'$(IsLocalBuild)' == 'true'">
+		<InternalsVisibleTo Include="Cirreum.Runtime.RemoteConnections.WebSockets.Tests" />
+	</ItemGroup>
+
 </Project>

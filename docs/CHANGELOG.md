@@ -12,6 +12,27 @@ guides linked at the bottom of each entry.
 
 ## [Unreleased]
 
+### Fixed
+
+* **A connection is registered scoped in a browser, and a singleton on a server.** It was always a
+  singleton, which is right on a server and wrong in a browser: a browser has exactly one scope,
+  created by the host and living as long as the application, and every service the application
+  composes is registered against it — the access-token provider among them. A singleton lives in the
+  root container instead, where none of them can be reached.
+
+  The effect depended on whether the host validated scopes: either the connection threw when it
+  resolved the credential source, or it silently resolved a *second* copy of the whole graph out of
+  the root, distinct from the one the application uses. Both were reported from the field, and the
+  workaround was to hand-roll a scope inside every credential source.
+
+  `AddRemoteConnectionFactory` carried the same fault and is fixed with it. The change reaches more
+  than credentials: a connection is built with `ActivatorUtilities`, so any scoped service an
+  application injects into its own connection type was equally unreachable.
+
+  Nothing observable changes for a consumer. A browser scope lives as long as the application, so
+  there is still exactly one connection for the application's life; on a server the registration is
+  unchanged.
+
 ## [2.0.0] - 2026-08-26
 
 ### Breaking
