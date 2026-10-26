@@ -12,6 +12,8 @@ guides linked at the bottom of each entry.
 
 ## [Unreleased]
 
+## [2.0.4] - 2026-10-26
+
 ### Updated
 
 - Re-pinned against the host-invocation wave: **`Cirreum.Persistence.*`**, **`Cirreum.RemoteConnections.*`**, **`Cirreum.Graph.Provider`**, **`Cirreum.Runtime.Wasm`** 4.0.3 — where referenced (all carry `Cirreum.Domain` 5.1.1 / `Cirreum.Contracts` 6.2.0).
